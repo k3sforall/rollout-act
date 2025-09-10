@@ -1,3 +1,4 @@
+
 # 3100-ingressroute-https-dokjongban.yaml
 # URL 기반 라우팅을 위한 기본 설정 (ChatGPT 프롬프트용)
 apiVersion: traefik.io/v1alpha1
