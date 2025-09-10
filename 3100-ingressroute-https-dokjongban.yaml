@@ -1,0 +1,115 @@
+# 3100-ingressroute-https-dokjongban.yaml
+# URL 기반 라우팅을 위한 기본 설정 (ChatGPT 프롬프트용)
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: dokjongban-com-https
+  namespace: default
+  labels:
+    app.kubernetes.io/name: dokjongban.com
+    app.kubernetes.io/component: ingressroute
+    app.kubernetes.io/managed-by: argocd
+  annotations:
+    # ▼ CRD 적용 전 드라이런 오류를 피하기 위함 (기존 유지)
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  entryPoints:
+    - websecure
+  tls:
+    secretName: dokjongban-com-tls-secret
+  routes:
+    # ================================================
+    # ▼ URL 기반 라우팅 섹션
+    # ================================================
+
+    # ▼ Nextjs 서비스: /doka → doka-nextjs-service
+    - kind: Rule
+      match: '(Host(`dokjongban.com`) || Host(`www.dokjongban.com`)) && PathPrefix(`/doka`)'
+      priority: 1290
+      middlewares:
+        - name: alt-svc
+      services:
+        - name: doka-nextjs-service
+          port: 80
+
+    # ▼ React KR 서비스: /memo-app → dokjongban-react-kr-service
+    - kind: Rule
+      match: '(Host(`dokjongban.com`) || Host(`www.dokjongban.com`)) && PathPrefix(`/memo-app`)'
+      priority: 1300
+      middlewares:
+        - name: alt-svc
+      services:
+        - name: dokjongban-react-kr-service
+          port: 80
+
+    # ▼ (신규) jenkins 프리뷰 확인 경로: /jen-react-preview → dokjongban-jen-react-preview
+    #    Blue/Green에서 새 버전(그린)을 프리뷰로 확인하는 용도입니다.
+    - kind: Rule
+      match: '(Host(`dokjongban.com`) || Host(`www.dokjongban.com`)) && PathPrefix(`/jen-react-preview`)'
+      priority: 1315
+      middlewares:
+        - name: alt-svc
+      services:
+        - name: dokjongban-jen-react-preview
+          port: 80
+
+    # ▼ jenkins 실서비스: /jen-react → dokjongban-jen-react-service (active)
+    #    Argo Rollouts가 active Service의 selector를 바꿔 블루→그린 전환을 수행합니다.
+    - kind: Rule
+      match: '(Host(`dokjongban.com`) || Host(`www.dokjongban.com`)) && PathPrefix(`/jen-react`)'
+      priority: 1310
+      middlewares:
+        - name: alt-svc
+      services:
+        - name: dokjongban-jen-react-service
+          port: 80
+
+    # ================================================
+    # ▼ 기존 라우팅 규칙들 (변경 없음)
+    # ================================================
+
+    - kind: Rule
+      match: '(Host(`dokjongban.com`) || Host(`www.dokjongban.com`)) && PathPrefix(`/check-refrigerator`) && (HeaderRegexp(`Accept-Language`, `(?i).*ko.*`) || HeaderRegexp(`User-Agent`, `(?i)(googlebot|bingbot|yeti)`) || ClientIP(`127.0.0.1`) || ClientIP(`175.207.29.178`) || ClientIP(`175.196.251.35`) || ClientIP(`121.190.145.249`) || ClientIP(`192.168.0.1`) || ClientIP(`10.42.0.0/16`) || ClientIP(`10.43.0.0/16`))'
+      priority: 1150
+      middlewares:
+        - name: alt-svc
+      services:
+        - name: dokjongban-com-worker-service
+          port: 80
+
+    - kind: Rule
+      match: '(Host(`dokjongban.com`) || Host(`www.dokjongban.com`)) && PathPrefix(`/`) && HeaderRegexp(`User-Agent`, `(?i)(googlebot|bingbot|yeti)`)'
+      priority: 1100
+      middlewares:
+        - name: alt-svc
+      services:
+        - name: dokjongban-com-service
+          port: 80
+
+    - kind: Rule
+      match: '(Host(`dokjongban.com`) || Host(`www.dokjongban.com`)) && PathPrefix(`/`) && HeaderRegexp(`Accept-Language`, `(?i).*ko.*`)'
+      priority: 1000
+      middlewares:
+        - name: alt-svc
+      services:
+        - name: dokjongban-com-service
+          port: 80
+
+    - kind: Rule
+      match: '(Host(`dokjongban.com`) || Host(`www.dokjongban.com`)) && PathPrefix(`/`) && (ClientIP(`127.0.0.1`) || ClientIP(`175.207.29.178`) || ClientIP(`175.196.251.35`) || ClientIP(`121.190.145.249`) || ClientIP(`192.168.0.1`) || ClientIP(`10.42.0.0/16`) || ClientIP(`10.43.0.0/16`))'
+      priority: 980
+      middlewares:
+        - name: alt-svc
+      services:
+        - name: dokjongban-com-service
+          port: 80
+
+    - kind: Rule
+      match: '(Host(`dokjongban.com`) || Host(`www.dokjongban.com`)) && PathPrefix(`/`) && !HeaderRegexp(`Accept-Language`, `(?i).*ko.*`)'
+      priority: 900
+      middlewares:
+        - name: alt-svc
+      services:
+        - name: dokjongban-com-worker-service
+          port: 80
