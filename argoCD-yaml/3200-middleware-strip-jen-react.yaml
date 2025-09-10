@@ -1,0 +1,27 @@
+# 3200-middleware-strip-jen-react.yaml
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-jen-react
+  namespace: default
+  annotations:
+    # 인그레스와 동시에 생성되어도 무방하나, 선적용을 위해 0 유지
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  stripPrefix:
+    prefixes:
+      - /jen-react
+      - /jen-react/
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-jen-react-preview
+  namespace: default
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  stripPrefix:
+    prefixes:
+      - /jen-react-preview
+      - /jen-react-preview/
