@@ -10,13 +10,11 @@ metadata:
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/instance: dokjongban-jen-react
   annotations:
-    # ▼ 서비스가 먼저 생성되어 있어야 Ingress가 안정적
     argocd.argoproj.io/sync-wave: "1"
 spec:
   type: ClusterIP
   selector:
-    # ▼ Rollouts가 해시(selector)를 주입/교체합니다(OutOfSync 방지를 위한
-    #    Argo CD ignoreDifferences는 아래 Application 설정에서 처리).
+    # Rollouts가 이 selector에 고유 해시를 주입/전환
     app: dokjongban-jen-react
   ports:
     - name: http
