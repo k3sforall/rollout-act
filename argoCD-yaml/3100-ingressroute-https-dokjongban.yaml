@@ -113,4 +113,3 @@ spec:
       services:
         - name: dokjongban-com-worker-service
           port: 80
----
