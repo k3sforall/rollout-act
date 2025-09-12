@@ -33,8 +33,8 @@ spec:
         - name: ghcr-dockerconfig
       containers:
         - name: web
-          # ★ 초기 Blue는 Apache httpd로 시작
-          image: httpd:2.4-alpine
+          # ★ Green 는 nginx로 시작
+          image: nginx:1.27-alpine
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
