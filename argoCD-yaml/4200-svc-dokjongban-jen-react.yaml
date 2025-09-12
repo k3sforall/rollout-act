@@ -1,4 +1,3 @@
-# 4200-svc-dokjongban-jen-react.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -11,10 +10,13 @@ metadata:
     app.kubernetes.io/instance: dokjongban-jen-react
   annotations:
     argocd.argoproj.io/sync-wave: "1"
+    # ▼ Argo CD가 이 Service의 selector 차이를 무시하도록 지정
+    argocd.argoproj.io/ignore-differences: |
+      jsonPointers:
+      - /spec/selector
 spec:
   type: ClusterIP
   selector:
-    # Rollouts가 이 selector에 고유 해시를 주입/전환
     app: dokjongban-jen-react
   ports:
     - name: http
