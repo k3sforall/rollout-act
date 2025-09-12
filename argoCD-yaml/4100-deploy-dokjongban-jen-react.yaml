@@ -28,12 +28,12 @@ spec:
         app: dokjongban-jen-react
         app.kubernetes.io/instance: dokjongban-jen-react
     spec:
-      # 사설 레지스트리 사용 시 필요(공용이미지에도 무해)
+      # 사설 레지스트리 사용 시 필요(공용 이미지에도 무해)
       imagePullSecrets:
         - name: ghcr-dockerconfig
       containers:
         - name: web
-          # ★ 초기 Blue는 httpd로 시작 (프리뷰/승격 테스트용)
+          # ★ 초기 Blue는 Apache httpd로 시작
           image: httpd:2.4-alpine
           imagePullPolicy: IfNotPresent
           ports:
@@ -56,5 +56,5 @@ spec:
     blueGreen:
       activeService: dokjongban-jen-react-service     # 실서비스(/jen-react)
       previewService: dokjongban-jen-react-preview    # 프리뷰(/jen-react-preview)
-      autoPromotionEnabled: false                     # 수동 승격
+      autoPromotionEnabled: false                     # 수동 승격 (UI에서 Promote)
       scaleDownDelaySeconds: 30                       # 전환 후 구버전 축출 지연
