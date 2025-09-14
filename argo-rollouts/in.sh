@@ -10,3 +10,8 @@ kubectl -n argo-rollouts create secret generic rollouts-basic-auth \
 helm upgrade --install argo-rollouts argo/argo-rollouts \
   -n argo-rollouts --create-namespace \
   -f values-argorollouts.yaml
+
+
+
+
+#remote commit and push
