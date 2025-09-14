@@ -11,7 +11,11 @@ helm upgrade --install argo-rollouts argo/argo-rollouts \
   -n argo-rollouts --create-namespace \
   -f values-argorollouts.yaml
 
+<<<<<<< HEAD
 
 
 
 #remote commit and push
+=======
+#for local commit
+>>>>>>> f2f56e4 (local commit)
