@@ -1,0 +1,12 @@
+# rollouts-basic-auth.yaml
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: rollouts-basic-auth
+  namespace: argo-rollouts
+spec:
+  basicAuth:
+    secret: rollouts-basic-auth
+    realm: "argorollouts.dokjongban.com"
+    removeHeader: true
+

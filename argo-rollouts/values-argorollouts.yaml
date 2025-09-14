@@ -13,34 +13,15 @@ rbac:
 
 dashboard:
   enabled: true
-  # 대시보드 기본 루트는 "rollouts" 입니다. (루트(/)로 바꾸지 않습니다)
   extraArgs:
-    - --root-path=rollouts
+    - --root-path=/rollouts          # 명시적으로 슬래시 포함 권장
     - --namespace=default
 
   service:
     type: ClusterIP
     port: 3100
 
+  # ✅ 차트 내 Ingress 비활성화 (충돌 원천 제거)
   ingress:
-    enabled: true
-    ingressClassName: traefik
-    annotations:
-      # HTTP로 서비스 (80)
-      traefik.ingress.kubernetes.io/router.entrypoints: web
-      # TLS 사용 안 함 → 아래 tls 섹션 제거, router.tls 주석/삭제
-      # traefik.ingress.kubernetes.io/router.tls: "false"
-    hosts:
-      - argorollouts.dokjongban.com
-    # 유지보수 단순화: 하나의 Ingress에 정적(/rollouts) + API(/api) 동시 매핑
-    paths:
-      - /rollouts
-      - /api
-    pathType: Prefix
-
-    # TLS 미사용: tls 블록 완전히 제거
-    # tls:
-    #   - secretName: (사용 안 함)
-    #     hosts:
-    #       - argorollouts.dokjongban.com
+    enabled: false
 
